@@ -1,0 +1,76 @@
+{
+  "basics": {
+    "name": "Jane Doe",
+    "location": "Seattle, WA",
+    "phone": "555-123-4567",
+    "email": "jane.doe@email.com",
+    "links": {
+      "linkedin": "https://linkedin.com/in/janedoe",
+      "github": "https://github.com/janedoe",
+      "portfolio": ""
+    },
+    "_selected": {
+      "location": true,
+      "phone": true,
+      "email": true,
+      "linkedin": true,
+      "github": false,
+      "portfolio": false
+    }
+  },
+  "education": [
+    {
+      "school": "Example University",
+      "degree": "MS",
+      "major": "Computer Science",
+      "location": "USA",
+      "start": "2020",
+      "end": "2022",
+      "gpa": "3.9/4.0",
+      "selected": true
+    }
+  ],
+  "skills": [
+    {
+      "header": "Programming",
+      "selected": true,
+      "items": [
+        {
+          "text": "Python",
+          "selected": true
+        },
+        {
+          "text": "Java",
+          "selected": true
+        }
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "company": "Tech Corp",
+      "location": "USA",
+      "roles": [
+        {
+          "title": "Software Engineer",
+          "start": "2022",
+          "end": "Present",
+          "pointers": [
+            {
+              "id": "exp-001",
+              "tags": [
+                "backend",
+                "python"
+              ],
+              "ats": "Built backend APIs in Python supporting 1M+ users.",
+              "recruiter": "Built scalable Python APIs used by over a million users.",
+              "selected": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [],
+  "removed_pointers": []
+}
