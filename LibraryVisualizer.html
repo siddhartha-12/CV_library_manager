@@ -1,0 +1,1900 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CV Library Editor + LaTeX Generator</title>
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --card: #111218;
+            --txt: #eaeaf0;
+            --muted: #a7a7b3;
+            --b: #1f2130;
+            --accent: #7aa2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--txt);
+            font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--b);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 15px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .leftHead {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .rightHead {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #1a1c27;
+            color: var(--txt);
+            border: 1px solid #2a2d3f;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            border-color: #3a3f5a;
+        }
+
+        .btn.primary {
+            background: rgba(122, 162, 255, .15);
+            border-color: rgba(122, 162, 255, .35);
+        }
+
+        .pill {
+            border: 1px solid #2a2d3f;
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: var(--muted);
+        }
+
+        .wrap {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            height: calc(100vh - 54px);
+        }
+
+        @media (max-width: 980px) {
+            .wrap {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            body {
+                overflow: auto;
+            }
+        }
+
+        aside {
+            border-right: 1px solid var(--b);
+            padding: 14px;
+            background: #0d0e14;
+            position: sticky;
+            top: 0;
+            height: 100%;
+            overflow: auto;
+        }
+
+        main {
+            padding: 14px;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--b);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            background: #0e1017;
+            color: var(--txt);
+            border: 1px solid #2a2d3f;
+            border-radius: 12px;
+            padding: 10px;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .pasteArea {
+            min-height: 300px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin: 8px 0 6px;
+        }
+
+        select {
+            background: #0e1017;
+            color: var(--txt);
+            border: 1px solid #2a2d3f;
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .item {
+            background: #0f131d;
+            border: 1px solid #262d45;
+            border-radius: 14px;
+            padding: 10px;
+        }
+
+        .item .item {
+            background: #0c1018;
+            border-color: #1f2538;
+        }
+
+        .item::before {
+            content: "";
+            display: block;
+            border-top: 1px solid rgba(122, 162, 255, .08);
+            margin: -10px -10px 10px -10px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .titleRow {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .titleLeft {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .title {
+            font-weight: 700;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tag {
+            font-size: 11px;
+            border: 1px solid #2a2d3f;
+            color: #cdd6ff;
+            padding: 3px 8px;
+            border-radius: 999px;
+        }
+
+        .small {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 980px) {
+            .split {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        details {
+            border: 1px solid #20233a;
+            border-radius: 14px;
+            background: #0e1017;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        summary {
+            cursor: pointer;
+            list-style: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .summaryRow {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chev {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 8px 0 0;
+        }
+
+        .navbtn {
+            width: 100%;
+            text-align: left;
+        }
+
+        .navbtn.active {
+            border-color: rgba(122, 162, 255, .45);
+            background: rgba(122, 162, 255, .10);
+        }
+
+        .chk {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .danger {
+            border-color: rgba(255, 122, 122, .35) !important;
+            background: rgba(255, 122, 122, .08) !important;
+        }
+
+        .ok {
+            border-color: rgba(122, 255, 170, .35) !important;
+            background: rgba(122, 255, 170, .08) !important;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        code {
+            background: #0e1017;
+            border: 1px solid #20233a;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        /* Dropdown groups (more visible) */
+        .dropGroup {
+            position: relative;
+        }
+
+        .dropBtn {
+            background: rgba(122, 162, 255, .10);
+            border: 1px solid rgba(122, 162, 255, .35);
+            color: var(--txt);
+            padding: 8px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 650;
+            letter-spacing: .2px;
+        }
+
+        .dropBtn:hover {
+            border-color: rgba(122, 162, 255, .55);
+        }
+
+        .menu {
+            position: absolute;
+            right: 0;
+            top: 44px;
+            width: 280px;
+            background: var(--card);
+            border: 1px solid var(--b);
+            border-radius: 14px;
+            padding: 8px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+            z-index: 50;
+        }
+
+        .menu button,
+        .menu label {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 10px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            background: transparent;
+            color: var(--txt);
+            font-size: 13px;
+        }
+
+        .menu button:hover,
+        .menu label:hover {
+            background: #0e1017;
+            border-color: #2a2d3f;
+        }
+
+        .menu .sep {
+            height: 1px;
+            background: #20233a;
+            margin: 8px 6px;
+        }
+
+        .menuTitle {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .9px;
+            padding: 6px 10px 4px;
+        }
+
+        /* Modal */
+        .modalBack {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 60;
+            padding: 18px;
+        }
+
+        .modal {
+            width: min(980px, 100%);
+            background: var(--card);
+            border: 1px solid var(--b);
+            border-radius: 18px;
+            padding: 12px;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modalHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modalHeader h2 {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+    </style>
+</head>
+
+<body>
+  <header>
+    <div class="leftHead">
+      <h1>CV Library Editor + LaTeX Generator</h1>
+      <span class="pill" id="statusPill">No file loaded</span>
+      <!-- Group 1: File -->
+      <div class="dropGroup">
+        <button class="dropBtn" data-menu="fileMenu" id="btnFile">File ▾</button>
+        <div class="menu hidden" id="fileMenu">
+          <div class="menuTitle">Load CVLibrary JSON</div>
+                    <label for="fileInput">Upload JSON <span class="meta">📄</span></label>
+                    <button id="btnOpenPaste">Paste JSON <span class="meta">📋</span></button>
+                    <div class="sep"></div>
+                    <button id="btnLoadLocal">Load saved <span class="meta">↩︎</span></button>
+          <button id="btnSaveLocal">Save to browser <span class="meta">💾</span></button>
+        </div>
+      </div>
+
+            <!-- Group 2: Generate -->
+            <div class="dropGroup">
+                <button class="dropBtn" data-menu="genMenu" id="btnGenerate">Generate ▾</button>
+                <div class="menu hidden" id="genMenu">
+                    <div class="menuTitle">CV output</div>
+                    <button id="btnGenLatex">Generate LaTeX <span class="meta">.tex</span></button>
+                    <button id="btnDownloadTex">Download cv.tex <span class="meta">⬇️</span></button>
+                    <div class="sep"></div>
+                    <button id="btnOpenLatexPreview">Open LaTeX preview <span class="meta">👀</span></button>
+                </div>
+            </div>
+
+            <!-- Group 3: Export -->
+            <div class="dropGroup">
+                <button class="dropBtn" data-menu="exportMenu" id="btnExport">Export ▾</button>
+                <div class="menu hidden" id="exportMenu">
+                    <div class="menuTitle">JSON exports</div>
+                    <button id="btnExportSelected">Download SELECTED JSON <span class="meta">⬇️</span></button>
+          <button id="btnExportFull">Download FULL JSON <span class="meta">⬇️</span></button>
+        </div>
+      </div>
+    </div>
+
+        <input id="fileInput" type="file" accept="application/json" style="display:none;" />
+    </header>
+
+    <div class="wrap">
+        <aside>
+            <div class="card">
+                <h2>Navigate</h2>
+                <div class="list" id="nav"></div>
+            </div>
+
+            <div class="card">
+                <h2>Search bullets</h2>
+                <input id="search" type="text" placeholder="search text, tags, company, project..." />
+                <label>Output mode (ATS / Recruiter)</label>
+                <select id="viewMode">
+                    <option value="both">ATS + Recruiter (prefer ATS)</option>
+                    <option value="ats">ATS only</option>
+                    <option value="recruiter">Recruiter only</option>
+                </select>
+                <p class="hint">This toggle controls LaTeX output and SELECTED JSON export.</p>
+            </div>
+
+            <div class="card">
+                <h2>Selection rules</h2>
+                <p class="small">
+                    Selection applies to <b>Basics</b>, <b>Education</b>, <b>Skills</b>, <b>Experience</b> and
+                    <b>Projects</b>.
+                    If a section has <b>no selected content</b>, it is omitted from the generated CV.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Removed pointers</h2>
+                <p class="small">Track removed/merged IDs here.</p>
+                <button class="btn" id="btnAddRemoved">Add removed entry</button>
+            </div>
+        </aside>
+
+        <main>
+            <div id="editor"></div>
+        </main>
+    </div>
+
+    <!-- Paste JSON Modal -->
+    <div class="modalBack hidden" id="pasteModalBack">
+        <div class="modal">
+            <div class="modalHeader">
+                <h2>Paste JSON</h2>
+                <button class="btn" id="btnClosePaste">Close</button>
+            </div>
+            <textarea id="pasteBox" class="pasteArea" placeholder="Paste your CVLibrary JSON here..."></textarea>
+            <div class="toolbar" style="margin-top:10px;">
+                <button class="btn primary" id="btnLoadPasted">Load pasted JSON</button>
+                <button class="btn" id="btnClearPaste">Clear</button>
+            </div>
+            <p class="hint">Tip: after loading, use File → Save to browser for quick reuse.</p>
+        </div>
+    </div>
+
+    <!-- LaTeX Modal -->
+    <div class="modalBack hidden" id="latexModalBack">
+        <div class="modal">
+            <div class="modalHeader">
+                <h2>Generated LaTeX</h2>
+                <button class="btn" id="btnCloseLatex">Close</button>
+            </div>
+            <textarea id="latexOut" class="pasteArea" readonly></textarea>
+            <div class="toolbar" style="margin-top:10px;">
+                <button class="btn" id="btnCopyLatex">Copy LaTeX</button>
+                <button class="btn" id="btnDownloadTex2">Download cv.tex</button>
+            </div>
+            <p class="hint">Next: upload <code>cv.tex</code> to Overleaf to compile to PDF.</p>
+        </div>
+    </div>
+
+    <script>
+        // ------------------------------------------------------------
+        // State + helpers
+        // ------------------------------------------------------------
+        let state = null;
+        let currentSection = "basics";
+        const openRoleKeys = new Set(); // "ci:ri"
+        let generatedLatex = "";
+
+        const $ = (sel) => document.querySelector(sel);
+        const el = (tag, attrs = {}, children = []) => {
+            const n = document.createElement(tag);
+            Object.entries(attrs).forEach(([k, v]) => {
+                if (k === "class") n.className = v;
+                else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+                else n.setAttribute(k, v);
+            });
+            (Array.isArray(children) ? children : [children]).forEach(c => {
+                if (c == null) return;
+                if (typeof c === "string") n.appendChild(document.createTextNode(c));
+                else n.appendChild(c);
+            });
+            return n;
+        };
+        const deepSet = (obj, path, value) => {
+            let cur = obj;
+            for (let i = 0; i < path.length - 1; i++) {
+                const k = path[i];
+                if (cur[k] == null) cur[k] = (typeof path[i + 1] === "number") ? [] : {};
+                cur = cur[k];
+            }
+            cur[path[path.length - 1]] = value;
+        };
+        const clone = (obj) => JSON.parse(JSON.stringify(obj));
+        const downloadText = (filename, text, mime = "application/json") => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(new Blob([text], { type: mime }));
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        };
+        const setStatus = (msg, kind = "neutral") => {
+            const pill = $("#statusPill");
+            pill.textContent = msg;
+            pill.classList.remove("danger", "ok");
+            if (kind === "danger") pill.classList.add("danger");
+            if (kind === "ok") pill.classList.add("ok");
+        };
+
+        // ------------------------------------------------------------
+        // Dropdown groups
+        // ------------------------------------------------------------
+        function closeAllMenus() {
+            document.querySelectorAll(".menu").forEach(m => m.classList.add("hidden"));
+            document.querySelectorAll(".dropBtn").forEach(b => {
+                const base = b.textContent.replace("▴", "▾").trim();
+                if (!base.endsWith("▾")) b.textContent = base + " ▾";
+                else b.textContent = base;
+            });
+        }
+
+        function toggleMenu(menuId, buttonEl) {
+            const menu = document.getElementById(menuId);
+            const isOpen = !menu.classList.contains("hidden");
+            closeAllMenus();
+            if (!isOpen) {
+                menu.classList.remove("hidden");
+                buttonEl.textContent = buttonEl.textContent.replace("▾", "▴");
+            }
+        }
+
+        document.querySelectorAll(".dropBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                toggleMenu(btn.dataset.menu, btn);
+            });
+        });
+
+        document.addEventListener("click", () => closeAllMenus());
+        document.querySelectorAll(".menu").forEach(m => m.addEventListener("click", (e) => e.stopPropagation()));
+
+        // ------------------------------------------------------------
+        // Modal helpers
+        // ------------------------------------------------------------
+        function openModal(idBack) { $(idBack).classList.remove("hidden"); }
+        function closeModal(idBack) { $(idBack).classList.add("hidden"); }
+
+        $("#btnOpenPaste").addEventListener("click", () => { closeAllMenus(); openModal("#pasteModalBack"); $("#pasteBox").focus(); });
+        $("#btnClosePaste").addEventListener("click", () => closeModal("#pasteModalBack"));
+        $("#btnCloseLatex").addEventListener("click", () => closeModal("#latexModalBack"));
+        $("#pasteModalBack").addEventListener("click", (e) => { if (e.target.id === "pasteModalBack") closeModal("#pasteModalBack"); });
+        $("#latexModalBack").addEventListener("click", (e) => { if (e.target.id === "latexModalBack") closeModal("#latexModalBack"); });
+
+        // ------------------------------------------------------------
+        // Merge/Replace prompt
+        // ------------------------------------------------------------
+        function loadOrMergeJSON(newObj, sourceLabel = "Loaded JSON") {
+            if (!state) { loadJSON(newObj, sourceLabel); return; }
+
+            const doMerge = confirm(
+                "A CV library is already loaded.\n\nOK = Update existing (merge top-level sections)\nCancel = Replace with new JSON"
+            );
+
+            if (!doMerge) { loadJSON(newObj, sourceLabel + " (replaced)"); return; }
+
+            const merged = clone(state);
+            for (const [k, v] of Object.entries(newObj)) {
+                if (Array.isArray(v)) merged[k] = v;
+                else if (v && typeof v === "object" && !Array.isArray(v)) merged[k] = { ...(merged[k] || {}), ...v };
+                else merged[k] = v;
+            }
+            loadJSON(merged, sourceLabel + " (merged)");
+        }
+
+        // ------------------------------------------------------------
+        // Selection normalization
+        // ------------------------------------------------------------
+        function normalizeSelectedValue(v) {
+            if (v === true) return true;
+            if (v === 1) return true;
+            if (typeof v === "string" && (v.toLowerCase() === "true" || v === "1")) return true;
+            return false;
+        }
+
+        function normalizeProjectsKey() {
+            if (!state) return;
+            if (!state.projects && Array.isArray(state.academic_projects)) {
+                state.projects = state.academic_projects;
+                delete state.academic_projects;
+            }
+            if (!Array.isArray(state.projects)) state.projects = [];
+        }
+
+        function ensureBasicsSelection() {
+            state.basics ||= {};
+            state.basics._selected ||= {};
+            const sel = state.basics._selected;
+
+            const defaults = {
+                location: true,
+                phone: true,
+                email: true,
+                linkedin: true,
+                github: false,
+                portfolio: false,
+            };
+            for (const [k, v] of Object.entries(defaults)) {
+                if (!(k in sel)) sel[k] = v;
+                sel[k] = normalizeSelectedValue(sel[k]);
+            }
+        }
+
+        function ensureEducationSelection() {
+            (state.education || []).forEach(ed => {
+                if (!("selected" in ed)) ed.selected = true;
+                ed.selected = normalizeSelectedValue(ed.selected);
+            });
+        }
+
+        function normalizeSkills() {
+            if (!state) return;
+            let skills = state.skills || [];
+
+            if (skills && !Array.isArray(skills) && typeof skills === "object") {
+                const pretty = (k) => k.replace(/_/g, " ").replace(/\b\w/g, m => m.toUpperCase());
+                skills = Object.entries(skills).map(([k, v]) => ({ header: pretty(k), items: Array.isArray(v) ? v : [] }));
+            }
+            if (!Array.isArray(skills)) skills = [];
+
+            state.skills = skills.map(g => {
+                const group = {
+                    header: g.header ?? "",
+                    selected: ("selected" in g) ? normalizeSelectedValue(g.selected) : true,
+                    items: []
+                };
+
+                const items = g.items || [];
+                if (Array.isArray(items)) {
+                    if (items.length && typeof items[0] === "object" && items[0] !== null) {
+                        group.items = items.map(it => ({
+                            text: it.text ?? "",
+                            selected: ("selected" in it) ? normalizeSelectedValue(it.selected) : true
+                        }));
+                    } else {
+                        group.items = items.map(s => ({ text: String(s), selected: true }));
+                    }
+                } else if (typeof items === "string") {
+                    group.items = items.split(",").map(x => x.trim()).filter(Boolean).map(t => ({ text: t, selected: true }));
+                }
+                return group;
+            });
+        }
+
+        function ensureExperienceSelection() {
+            (state?.experience || []).forEach(co => {
+                (co.roles || []).forEach(role => {
+                    (role.pointers || []).forEach(p => {
+                        p.selected = normalizeSelectedValue(p.selected);
+                    });
+                });
+            });
+        }
+
+        function ensureProjectsSelection() {
+            normalizeProjectsKey();
+            (state?.projects || []).forEach(pr => {
+                (pr.pointers || []).forEach(p => { p.selected = normalizeSelectedValue(p.selected); });
+            });
+        }
+
+        function ensureAllSelectionFields() {
+            ensureBasicsSelection();
+            ensureEducationSelection();
+            normalizeSkills();
+            ensureExperienceSelection();
+            ensureProjectsSelection();
+            state.removed_pointers ||= [];
+        }
+
+        // ------------------------------------------------------------
+        // Selected-only export for ALL categories
+        // ------------------------------------------------------------
+        function buildSelectedOnlyJSONAll(src, mode) {
+            const out = clone(src);
+
+            out.basics ||= {};
+            out.basics._selected ||= {};
+            const sel = out.basics._selected;
+
+            const basicsOut = { name: out.basics.name || "" };
+            if (normalizeSelectedValue(sel.location)) basicsOut.location = out.basics.location || "";
+            if (normalizeSelectedValue(sel.phone)) basicsOut.phone = out.basics.phone || "";
+            if (normalizeSelectedValue(sel.email)) basicsOut.email = out.basics.email || "";
+
+            const links = out.basics.links || {};
+            const linksOut = {};
+            if (normalizeSelectedValue(sel.linkedin) && links.linkedin) linksOut.linkedin = links.linkedin;
+            if (normalizeSelectedValue(sel.github) && links.github) linksOut.github = links.github;
+            if (normalizeSelectedValue(sel.portfolio) && links.portfolio) linksOut.portfolio = links.portfolio;
+            if (Object.keys(linksOut).length) basicsOut.links = linksOut;
+
+            out.basics = basicsOut;
+
+            out.education = (out.education || [])
+                .filter(ed => ("selected" in ed) ? normalizeSelectedValue(ed.selected) : true)
+                .map(ed => {
+                    const { selected, ...rest } = ed;
+                    return rest;
+                });
+
+            out.skills = (out.skills || [])
+                .filter(g => ("selected" in g) ? normalizeSelectedValue(g.selected) : true)
+                .map(g => {
+                    const items = (g.items || [])
+                        .filter(it => (typeof it === "object" && it !== null) ? (("selected" in it) ? normalizeSelectedValue(it.selected) : true) : true)
+                        .map(it => (typeof it === "object" && it !== null) ? (it.text ?? "") : String(it))
+                        .filter(t => String(t).trim().length > 0);
+                    return { header: g.header || "", items };
+                })
+                .filter(g => g.header || (g.items && g.items.length));
+
+            out.experience = (out.experience || [])
+                .map(co => {
+                    co.roles = (co.roles || [])
+                        .map(role => {
+                            role.pointers = (role.pointers || [])
+                                .filter(p => p && normalizeSelectedValue(p.selected))
+                                .map(p => {
+                                    const { selected, ...rest } = p;
+                                    if (mode === "ats") delete rest.recruiter;
+                                    if (mode === "recruiter") delete rest.ats;
+                                    return rest;
+                                });
+                            return role;
+                        })
+                        .filter(role => (role.pointers || []).length > 0);
+                    return co;
+                })
+                .filter(co => (co.roles || []).length > 0);
+
+            if (!out.projects && Array.isArray(out.academic_projects)) {
+                out.projects = out.academic_projects;
+                delete out.academic_projects;
+            }
+            out.projects = (out.projects || [])
+                .map(pr => {
+                    pr.pointers = (pr.pointers || [])
+                        .filter(p => p && normalizeSelectedValue(p.selected))
+                        .map(p => {
+                            const { selected, ...rest } = p;
+                            if (mode === "ats") delete rest.recruiter;
+                            if (mode === "recruiter") delete rest.ats;
+                            return rest;
+                        });
+                    return pr;
+                })
+                .filter(pr => (pr.pointers || []).length > 0);
+
+            out.removed_pointers = out.removed_pointers || [];
+            return out;
+        }
+
+        // ------------------------------------------------------------
+        // Load JSON
+        // ------------------------------------------------------------
+        function loadJSON(obj, sourceLabel = "Loaded JSON") {
+            state = obj;
+            ensureAllSelectionFields();
+            setStatus(`${sourceLabel} ✔`, "ok");
+            buildNav();
+            render();
+        }
+
+        // ------------------------------------------------------------
+        // Upload + paste + storage
+        // ------------------------------------------------------------
+        $("#fileInput").addEventListener("change", async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const text = await f.text();
+            try { loadOrMergeJSON(JSON.parse(text), `Uploaded ${f.name}`); }
+            catch { alert("Invalid JSON file."); }
+            e.target.value = "";
+            closeAllMenus();
+        });
+
+        $("#btnLoadPasted").addEventListener("click", () => {
+            const text = $("#pasteBox").value.trim();
+            if (!text) return alert("Paste JSON first.");
+            try {
+                loadOrMergeJSON(JSON.parse(text), "Loaded from paste");
+                closeModal("#pasteModalBack");
+            } catch {
+                alert("Invalid JSON in paste area.");
+            }
+        });
+        $("#btnClearPaste").addEventListener("click", () => { $("#pasteBox").value = ""; $("#pasteBox").focus(); });
+
+        $("#btnExportFull").addEventListener("click", () => {
+            if (!state) return alert("Load JSON first.");
+            ensureAllSelectionFields();
+            downloadText("cv_library_full.json", JSON.stringify(state, null, 2));
+            closeAllMenus();
+        });
+
+        $("#btnExportSelected").addEventListener("click", () => {
+            if (!state) return alert("Load JSON first.");
+            ensureAllSelectionFields();
+            const mode = $("#viewMode").value;
+            const selectedOnly = buildSelectedOnlyJSONAll(state, mode);
+            downloadText("cv_library_selected.json", JSON.stringify(selectedOnly, null, 2));
+            closeAllMenus();
+        });
+
+        $("#btnSaveLocal").addEventListener("click", () => {
+            if (!state) return alert("Load JSON first.");
+            ensureAllSelectionFields();
+            localStorage.setItem("cv_library_json", JSON.stringify(state));
+            setStatus("Saved to browser ✔", "ok");
+            closeAllMenus();
+        });
+
+        $("#btnLoadLocal").addEventListener("click", () => {
+            const raw = localStorage.getItem("cv_library_json");
+            if (!raw) return alert("No saved JSON found in this browser.");
+            try { loadOrMergeJSON(JSON.parse(raw), "Loaded from browser"); }
+            catch { alert("Saved JSON is corrupted."); }
+            closeAllMenus();
+        });
+
+        // ------------------------------------------------------------
+        // Navigation + Render
+        // ------------------------------------------------------------
+        function buildNav() {
+            const nav = $("#nav");
+            nav.innerHTML = "";
+            const sections = [
+                { key: "basics", label: "Basics" },
+                { key: "education", label: "Education" },
+                { key: "skills", label: "Skills" },
+                { key: "experience", label: "Experience" },
+                { key: "projects", label: "Projects" },
+                { key: "removed_pointers", label: "Removed pointers" }
+            ];
+            sections.forEach(s => {
+                nav.appendChild(el("button", {
+                    class: "btn navbtn" + (currentSection === s.key ? " active" : ""),
+                    onclick: () => { currentSection = s.key; buildNav(); render(); }
+                }, s.label));
+            });
+        }
+
+        function render() {
+            const root = $("#editor");
+            root.innerHTML = "";
+
+            if (!state) {
+                root.appendChild(el("div", { class: "card danger" }, [
+                    el("h2", {}, "No JSON loaded"),
+                    el("p", { class: "small" }, "Use File → Upload JSON / Paste JSON / Load saved."),
+                ]));
+                return;
+            }
+
+            if (currentSection === "basics") root.appendChild(renderBasics());
+            else if (currentSection === "education") root.appendChild(renderEducation());
+            else if (currentSection === "skills") root.appendChild(renderSkills());
+            else if (currentSection === "experience") root.appendChild(renderExperience());
+            else if (currentSection === "projects") root.appendChild(renderProjects());
+            else if (currentSection === "removed_pointers") root.appendChild(renderRemoved());
+        }
+
+        // ------------------------------------------------------------
+        // Basics
+        // ------------------------------------------------------------
+        function renderBasics() {
+            ensureBasicsSelection();
+            const b = state.basics || {};
+            const sel = b._selected || {};
+            const card = el("div", { class: "card" }, [el("h2", {}, "Basics")]);
+
+            card.appendChild(el("label", {}, "Name (always included)"));
+            const nameIn = el("input", { type: "text", value: b.name || "" });
+            nameIn.addEventListener("input", () => deepSet(state, ["basics", "name"], nameIn.value));
+            card.appendChild(nameIn);
+
+            const fields = [["location", "Location"], ["phone", "Phone"], ["email", "Email"]];
+            fields.forEach(([k, labelText]) => {
+                const row = el("div", { class: "top", style: "margin-top:10px;" }, [
+                    el("label", { style: "margin:0; display:flex; gap:8px; align-items:center;" }, [
+                        (() => {
+                            const cb = el("input", { type: "checkbox" });
+                            cb.checked = normalizeSelectedValue(sel[k]);
+                            cb.addEventListener("change", () => deepSet(state, ["basics", "_selected", k], cb.checked));
+                            return cb;
+                        })(),
+                        el("span", {}, `Include ${labelText}`)
+                    ])
+                ]);
+                card.appendChild(row);
+
+                const input = el("input", { type: "text", value: b[k] || "" });
+                input.addEventListener("input", () => deepSet(state, ["basics", k], input.value));
+                card.appendChild(input);
+            });
+
+            card.appendChild(el("h2", { style: "margin-top:14px;" }, "Links"));
+
+            const links = b.links || {};
+            const linkFields = [["linkedin", "LinkedIn"], ["github", "GitHub"], ["portfolio", "Portfolio"]];
+            linkFields.forEach(([k, lbl]) => {
+                const row = el("div", { class: "top", style: "margin-top:10px;" }, [
+                    el("label", { style: "margin:0; display:flex; gap:8px; align-items:center;" }, [
+                        (() => {
+                            const cb = el("input", { type: "checkbox" });
+                            cb.checked = normalizeSelectedValue(sel[k]);
+                            cb.addEventListener("change", () => deepSet(state, ["basics", "_selected", k], cb.checked));
+                            return cb;
+                        })(),
+                        el("span", {}, `Include ${lbl}`)
+                    ])
+                ]);
+                card.appendChild(row);
+
+                const input = el("input", { type: "text", value: links[k] || "" });
+                input.addEventListener("input", () => deepSet(state, ["basics", "links", k], input.value));
+                card.appendChild(input);
+            });
+
+            return card;
+        }
+
+        // ------------------------------------------------------------
+        // Education
+        // ------------------------------------------------------------
+        function renderEducation() {
+            ensureEducationSelection();
+            const card = el("div", { class: "card" }, [el("h2", {}, "Education")]);
+            const arr = state.education || [];
+            const list = el("div", { class: "list" });
+
+            arr.forEach((ed, i) => {
+                const item = el("div", { class: "item" }, [
+                    (() => {
+                        const selectWrap = el("label", { class: "small chk", style: "margin:0;" }, [
+                            (() => {
+                                const cb = el("input", { type: "checkbox" });
+                                cb.checked = normalizeSelectedValue(ed.selected);
+                                cb.addEventListener("change", () => { deepSet(state, ["education", i, "selected"], cb.checked); });
+                                return cb;
+                            })(),
+                            el("span", {}, "Select")
+                        ]);
+
+                        return el("div", { class: "titleRow" }, [
+                            el("div", { class: "titleLeft" }, [
+                                selectWrap,
+                                el("div", {}, [
+                                    el("div", { class: "title" }, ed.school || `Education #${i + 1}`),
+                                    el("div", { class: "meta" }, `${ed.degree || ""}${ed.major ? " • " + ed.major : ""}`)
+                                ])
+                            ]),
+                            el("div", { class: "toolbar" }, [
+                                el("button", { class: "btn", onclick: () => { arr.splice(i, 1); render(); } }, "Remove")
+                            ])
+                        ]);
+                    })()
+                ]);
+
+                const fields = [["school", "School"], ["degree", "Degree"], ["major", "Major"], ["location", "Location"], ["start", "Start"], ["end", "End"], ["gpa", "GPA"]];
+                fields.forEach(([k, lbl]) => {
+                    item.appendChild(el("label", {}, lbl));
+                    const input = el("input", { type: "text", value: ed[k] || "" });
+                    input.addEventListener("input", () => deepSet(state, ["education", i, k], input.value));
+                    item.appendChild(input);
+                });
+
+                list.appendChild(item);
+            });
+
+            card.appendChild(list);
+            card.appendChild(el("div", { style: "margin-top:10px;" }, [
+                el("button", {
+                    class: "btn primary", onclick: () => {
+                        (state.education ||= []).push({ selected: true, school: "", degree: "", major: "", location: "", start: "", end: "", gpa: "" });
+                        render();
+                    }
+                }, "Add education")
+            ]));
+            return card;
+        }
+
+        // ------------------------------------------------------------
+        // Skills
+        // ------------------------------------------------------------
+        function renderSkills() {
+            normalizeSkills();
+            const card = el("div", { class: "card" }, [el("h2", {}, "Skills")]);
+            const list = el("div", { class: "list" });
+
+            (state.skills || []).forEach((group, gi) => {
+                const item = el("div", { class: "item" }, [
+                    (() => {
+                        const selectWrap = el("label", { class: "small chk", style: "margin:0;" }, [
+                            (() => {
+                                const cb = el("input", { type: "checkbox" });
+                                cb.checked = normalizeSelectedValue(group.selected);
+                                cb.addEventListener("change", () => { deepSet(state, ["skills", gi, "selected"], cb.checked); render(); });
+                                return cb;
+                            })(),
+                            el("span", {}, "Select group")
+                        ]);
+
+                        return el("div", { class: "titleRow" }, [
+                            el("div", { class: "titleLeft" }, [
+                                selectWrap,
+                                el("div", {}, [
+                                    el("div", { class: "title" }, group.header || `Skill Group #${gi + 1}`),
+                                    el("div", { class: "meta" }, `${(group.items || []).length} item(s)`)
+                                ])
+                            ]),
+                            el("div", { class: "toolbar" }, [
+                                el("button", { class: "btn", onclick: () => { state.skills.splice(gi, 1); render(); } }, "Remove"),
+                                el("button", { class: "btn", onclick: () => { if (gi > 0) { [state.skills[gi - 1], state.skills[gi]] = [state.skills[gi], state.skills[gi - 1]]; render(); } } }, "↑"),
+                                el("button", { class: "btn", onclick: () => { if (gi < state.skills.length - 1) { [state.skills[gi + 1], state.skills[gi]] = [state.skills[gi], state.skills[gi + 1]]; render(); } } }, "↓")
+                            ])
+                        ]);
+                    })()
+                ]);
+
+                item.appendChild(el("label", {}, "Header"));
+                const h = el("input", { type: "text", value: group.header || "" });
+                h.addEventListener("input", () => deepSet(state, ["skills", gi, "header"], h.value));
+                item.appendChild(h);
+
+                const itemsBox = el("div", { class: "item", style: "margin-top:10px;" }, [
+                    el("div", { class: "top" }, [
+                        el("div", {}, el("div", { class: "title" }, "Items")),
+                        el("div", { class: "toolbar" }, [
+                            el("button", { class: "btn", onclick: () => { (group.items || []).forEach((_, ii) => deepSet(state, ["skills", gi, "items", ii, "selected"], true)); render(); } }, "Select all"),
+                            el("button", { class: "btn", onclick: () => { (group.items || []).forEach((_, ii) => deepSet(state, ["skills", gi, "items", ii, "selected"], false)); render(); } }, "Clear"),
+                            el("button", { class: "btn primary", onclick: () => { (group.items ||= []).push({ text: "", selected: true }); render(); } }, "Add item")
+                        ])
+                    ])
+                ]);
+
+                const ilist = el("div", { class: "list", style: "margin-top:10px;" });
+                (group.items || []).forEach((it, ii) => {
+                    const row = el("div", { class: "item" }, [
+                        (() => {
+                            const selectWrap = el("label", { class: "small chk", style: "margin:0;" }, [
+                                (() => {
+                                    const cb = el("input", { type: "checkbox" });
+                                    cb.checked = normalizeSelectedValue(it.selected);
+                                    cb.addEventListener("change", () => { deepSet(state, ["skills", gi, "items", ii, "selected"], cb.checked); });
+                                    return cb;
+                                })(),
+                                el("span", {}, "Select")
+                            ]);
+
+                            return el("div", { class: "titleRow" }, [
+                                el("div", { class: "titleLeft" }, [
+                                    selectWrap,
+                                    el("div", {}, el("div", { class: "title" }, it.text || `Item #${ii + 1}`))
+                                ]),
+                                el("div", { class: "toolbar" }, [
+                                    el("button", { class: "btn", onclick: () => { group.items.splice(ii, 1); render(); } }, "Remove"),
+                                    el("button", { class: "btn", onclick: () => { if (ii > 0) { [group.items[ii - 1], group.items[ii]] = [group.items[ii], group.items[ii - 1]]; render(); } } }, "↑"),
+                                    el("button", { class: "btn", onclick: () => { if (ii < group.items.length - 1) { [group.items[ii + 1], group.items[ii]] = [group.items[ii], group.items[ii + 1]]; render(); } } }, "↓")
+                                ])
+                            ]);
+                        })()
+                    ]);
+
+                    row.appendChild(el("label", {}, "Text"));
+                    const t = el("input", { type: "text", value: it.text || "" });
+                    t.addEventListener("input", () => { deepSet(state, ["skills", gi, "items", ii, "text"], t.value); });
+                    row.appendChild(t);
+
+                    ilist.appendChild(row);
+                });
+
+                itemsBox.appendChild(ilist);
+                item.appendChild(itemsBox);
+
+                list.appendChild(item);
+            });
+
+            card.appendChild(list);
+            card.appendChild(el("div", { style: "margin-top:10px;" }, [
+                el("button", { class: "btn primary", onclick: () => { (state.skills ||= []).push({ header: "", selected: true, items: [] }); render(); } }, "Add skill group")
+            ]));
+            return card;
+        }
+
+        // ------------------------------------------------------------
+        // Experience
+        // ------------------------------------------------------------
+        function setRoleSelection(ci, ri, selected) {
+            const role = state.experience?.[ci]?.roles?.[ri];
+            if (!role) return;
+            (role.pointers || []).forEach((_, pi) => deepSet(state, ["experience", ci, "roles", ri, "pointers", pi, "selected"], !!selected));
+            ensureExperienceSelection();
+        }
+        function setCompanySelection(ci, selected) {
+            const co = state.experience?.[ci];
+            if (!co) return;
+            (co.roles || []).forEach((_, ri) => setRoleSelection(ci, ri, selected));
+        }
+
+        function renderExperience() {
+            ensureExperienceSelection();
+            const wrap = el("div", {});
+            const searchVal = $("#search").value.trim().toLowerCase();
+            const viewMode = $("#viewMode").value;
+
+            (state.experience || []).forEach((co, ci) => {
+                const card = el("div", { class: "card" }, [
+                    el("div", { class: "top" }, [
+                        el("h2", {}, `Experience — ${co.company || "Company"}`),
+                        el("div", { class: "toolbar" }, [
+                            el("button", { class: "btn", onclick: () => { setCompanySelection(ci, true); render(); } }, "Select all in company"),
+                            el("button", { class: "btn", onclick: () => { setCompanySelection(ci, false); render(); } }, "Clear company")
+                        ])
+                    ])
+                ]);
+
+                card.appendChild(el("div", { class: "split" }, [
+                    el("div", {}, [
+                        el("label", {}, "Company"),
+                        (() => {
+                            const input = el("input", { type: "text", value: co.company || "" });
+                            input.addEventListener("input", () => deepSet(state, ["experience", ci, "company"], input.value));
+                            return input;
+                        })()
+                    ]),
+                    el("div", {}, [
+                        el("label", {}, "Location"),
+                        (() => {
+                            const input = el("input", { type: "text", value: co.location || "" });
+                            input.addEventListener("input", () => deepSet(state, ["experience", ci, "location"], input.value));
+                            return input;
+                        })()
+                    ])
+                ]));
+
+                (co.roles || []).forEach((role, ri) => {
+                    const roleKey = `${ci}:${ri}`;
+                    const details = el("details", {});
+                    details.open = openRoleKeys.has(roleKey);
+
+                    details.addEventListener("toggle", () => {
+                        if (details.open) openRoleKeys.add(roleKey);
+                        else openRoleKeys.delete(roleKey);
+                    });
+
+                    const selectedCount = (role.pointers || []).filter(p => normalizeSelectedValue(p.selected)).length;
+
+                    const summary = el("summary", {}, [
+                        el("div", { class: "summaryRow" }, [
+                            el("div", {}, [
+                                el("div", { class: "title" }, role.title || "Role"),
+                                el("div", { class: "meta" }, `${role.start || ""} — ${role.end || ""} • ${(role.pointers || []).length} pointer(s) • ${selectedCount} selected`)
+                            ]),
+                            el("div", { class: "chev" }, details.open ? "Collapse ▴" : "Expand ▾")
+                        ])
+                    ]);
+
+                    details.addEventListener("toggle", () => {
+                        const chev = summary.querySelector(".chev");
+                        if (chev) chev.textContent = details.open ? "Collapse ▴" : "Expand ▾";
+                    });
+
+                    details.appendChild(summary);
+
+                    const body = el("div", { style: "margin-top:10px;" });
+
+                    const roleBox = el("div", { class: "item" });
+                    roleBox.appendChild(el("div", { class: "top" }, [
+                        el("div", {}, el("div", { class: "title" }, "Role details")),
+                        el("button", {
+                            class: "btn",
+                            onclick: (e) => {
+                                e.preventDefault();
+                                openRoleKeys.delete(roleKey);
+                                (co.roles).splice(ri, 1);
+                                render();
+                            }
+                        }, "Remove role")
+                    ]));
+
+                    [["title", "Title"], ["start", "Start"], ["end", "End"]].forEach(([k, lbl]) => {
+                        roleBox.appendChild(el("label", {}, lbl));
+                        const input = el("input", { type: "text", value: role[k] || "" });
+                        input.addEventListener("input", () => { deepSet(state, ["experience", ci, "roles", ri, k], input.value); openRoleKeys.add(roleKey); });
+                        roleBox.appendChild(input);
+                    });
+                    body.appendChild(roleBox);
+
+                    const pContainer = el("div", { class: "item", style: "margin-top:10px;" });
+                    pContainer.appendChild(el("div", { class: "top" }, [
+                        el("div", {}, el("div", { class: "title" }, "Pointers")),
+                        el("div", { class: "toolbar" }, [
+                            el("button", { class: "btn", onclick: (e) => { e.preventDefault(); openRoleKeys.add(roleKey); setRoleSelection(ci, ri, true); render(); } }, "Select all in role"),
+                            el("button", { class: "btn", onclick: (e) => { e.preventDefault(); openRoleKeys.add(roleKey); setRoleSelection(ci, ri, false); render(); } }, "Clear role"),
+                            el("button", {
+                                class: "btn primary",
+                                onclick: (e) => {
+                                    e.preventDefault();
+                                    openRoleKeys.add(roleKey);
+                                    (role.pointers ||= []).push({ id: "", tags: [], ats: "", recruiter: "", selected: false });
+                                    render();
+                                }
+                            }, "Add pointer")
+                        ])
+                    ]));
+
+                    const pList = el("div", { class: "list", style: "margin-top:10px;" });
+
+                    (role.pointers || []).forEach((p, pi) => {
+                        const hay = [co.company, role.title, p.id, ...(p.tags || []), p.ats, p.recruiter].filter(Boolean).join(" ").toLowerCase();
+                        if (searchVal && !hay.includes(searchVal)) return;
+
+                        const pItem = el("div", { class: "item" });
+
+                        pItem.appendChild((() => {
+                            const selectWrap = el("label", { class: "small chk", style: "margin:0;" }, [
+                                (() => {
+                                    const cb = el("input", { type: "checkbox" });
+                                    cb.checked = normalizeSelectedValue(p.selected);
+                                    cb.addEventListener("change", (e) => {
+                                        openRoleKeys.add(roleKey);
+                                        deepSet(state, ["experience", ci, "roles", ri, "pointers", pi, "selected"], e.target.checked);
+                                        ensureExperienceSelection();
+                                        render();
+                                    });
+                                    return cb;
+                                })(),
+                                el("span", {}, "Select")
+                            ]);
+
+                            return el("div", { class: "titleRow" }, [
+                                el("div", { class: "titleLeft" }, [
+                                    selectWrap,
+                                    el("div", {}, [
+                                        el("div", { class: "title" }, p.id || `pointer-${pi + 1}`),
+                                        el("div", { class: "meta" }, (p.tags || []).join(", "))
+                                    ])
+                                ]),
+                                el("div", { class: "toolbar" }, [
+                                    el("button", { class: "btn", onclick: (e) => { e.preventDefault(); openRoleKeys.add(roleKey); role.pointers.splice(pi, 1); render(); } }, "Remove"),
+                                    el("button", { class: "btn", onclick: (e) => { e.preventDefault(); openRoleKeys.add(roleKey); if (pi > 0) { [role.pointers[pi - 1], role.pointers[pi]] = [role.pointers[pi], role.pointers[pi - 1]]; render(); } } }, "↑"),
+                                    el("button", { class: "btn", onclick: (e) => { e.preventDefault(); openRoleKeys.add(roleKey); if (pi < role.pointers.length - 1) { [role.pointers[pi + 1], role.pointers[pi]] = [role.pointers[pi], role.pointers[pi + 1]]; render(); } } }, "↓")
+                                ])
+                            ]);
+                        })());
+
+                        pItem.appendChild(el("label", {}, "ID"));
+                        const idIn = el("input", { type: "text", value: p.id || "" });
+                        idIn.addEventListener("input", () => { openRoleKeys.add(roleKey); deepSet(state, ["experience", ci, "roles", ri, "pointers", pi, "id"], idIn.value); });
+                        pItem.appendChild(idIn);
+
+                        pItem.appendChild(el("label", {}, "Tags (comma-separated)"));
+                        const tagsIn = el("input", { type: "text", value: (p.tags || []).join(", ") });
+                        tagsIn.addEventListener("input", () => {
+                            openRoleKeys.add(roleKey);
+                            const arr = tagsIn.value.split(",").map(x => x.trim()).filter(Boolean);
+                            deepSet(state, ["experience", ci, "roles", ri, "pointers", pi, "tags"], arr);
+                            render();
+                        });
+                        pItem.appendChild(tagsIn);
+
+                        const split = el("div", { class: "split" });
+
+                        if (viewMode === "both" || viewMode === "ats") {
+                            const a = el("div", {}, [el("label", {}, "ATS")]);
+                            const ta = el("textarea"); ta.value = p.ats || "";
+                            ta.addEventListener("input", () => { openRoleKeys.add(roleKey); deepSet(state, ["experience", ci, "roles", ri, "pointers", pi, "ats"], ta.value); });
+                            a.appendChild(ta); split.appendChild(a);
+                        }
+
+                        if (viewMode === "both" || viewMode === "recruiter") {
+                            const r = el("div", {}, [el("label", {}, "Recruiter")]);
+                            const ta = el("textarea"); ta.value = p.recruiter || "";
+                            ta.addEventListener("input", () => { openRoleKeys.add(roleKey); deepSet(state, ["experience", ci, "roles", ri, "pointers", pi, "recruiter"], ta.value); });
+                            r.appendChild(ta); split.appendChild(r);
+                        }
+
+                        pItem.appendChild(split);
+                        pItem.appendChild(el("div", { class: "tags" }, (p.tags || []).map(t => el("span", { class: "tag" }, t))));
+                        pList.appendChild(pItem);
+                    });
+
+                    pContainer.appendChild(pList);
+                    body.appendChild(pContainer);
+
+                    details.appendChild(body);
+                    card.appendChild(details);
+                });
+
+                card.appendChild(el("div", { style: "margin-top:10px;" }, [
+                    el("button", { class: "btn primary", onclick: () => { (co.roles ||= []).push({ title: "", start: "", end: "", pointers: [] }); render(); } }, "Add role")
+                ]));
+
+                wrap.appendChild(card);
+            });
+
+            wrap.appendChild(el("div", { class: "card" }, [
+                el("h2", {}, "Add company"),
+                el("button", { class: "btn primary", onclick: () => { (state.experience ||= []).push({ company: "", location: "", roles: [] }); render(); } }, "Add experience entry")
+            ]));
+
+            return wrap;
+        }
+
+        // ------------------------------------------------------------
+        // Projects
+        // ------------------------------------------------------------
+        function renderProjects() {
+            ensureProjectsSelection();
+            normalizeProjectsKey();
+
+            const wrap = el("div", {});
+            const searchVal = $("#search").value.trim().toLowerCase();
+            const viewMode = $("#viewMode").value;
+
+            const card = el("div", { class: "card" }, [el("h2", {}, "Academic Projects")]);
+
+            (state.projects || []).forEach((pr, pi) => {
+                pr.pointers ||= [];
+                const selectedCount = pr.pointers.filter(p => normalizeSelectedValue(p.selected)).length;
+
+                const pCard = el("div", { class: "item" });
+
+                pCard.appendChild(el("div", { class: "top" }, [
+                    el("div", {}, [
+                        el("div", { class: "title" }, pr.title || pr.name || `Project #${pi + 1}`),
+                        el("div", { class: "meta" },
+                            `${pr.org || pr.school || ""}${(pr.start || pr.end) ? ` • ${pr.start || ""} — ${pr.end || ""}` : ""} • ${pr.pointers.length} pointer(s) • ${selectedCount} selected`
+                        )
+                    ]),
+                    el("div", { class: "toolbar" }, [
+                        el("button", { class: "btn", onclick: () => { pr.pointers.forEach((_, ppi) => deepSet(state, ["projects", pi, "pointers", ppi, "selected"], true)); render(); } }, "Select all"),
+                        el("button", { class: "btn", onclick: () => { pr.pointers.forEach((_, ppi) => deepSet(state, ["projects", pi, "pointers", ppi, "selected"], false)); render(); } }, "Clear"),
+                        el("button", { class: "btn", onclick: () => { state.projects.splice(pi, 1); render(); } }, "Remove")
+                    ])
+                ]));
+
+                const fields = [["title", "Title"], ["org", "Org/School"], ["start", "Start"], ["end", "End"]];
+                fields.forEach(([k, lbl]) => {
+                    pCard.appendChild(el("label", {}, lbl));
+                    const input = el("input", { type: "text", value: pr[k] || "" });
+                    input.addEventListener("input", () => deepSet(state, ["projects", pi, k], input.value));
+                    pCard.appendChild(input);
+                });
+
+                const ptrBox = el("div", { class: "item", style: "margin-top:10px;" });
+                ptrBox.appendChild(el("div", { class: "top" }, [
+                    el("div", {}, el("div", { class: "title" }, "Pointers")),
+                    el("div", { class: "toolbar" }, [
+                        el("button", { class: "btn primary", onclick: () => { pr.pointers.push({ id: "", tags: [], ats: "", recruiter: "", selected: false }); render(); } }, "Add pointer")
+                    ])
+                ]));
+
+                const list = el("div", { class: "list", style: "margin-top:10px;" });
+
+                pr.pointers.forEach((p, ppi) => {
+                    const hay = [pr.title, pr.org, p.id, ...(p.tags || []), p.ats, p.recruiter].filter(Boolean).join(" ").toLowerCase();
+                    if (searchVal && !hay.includes(searchVal)) return;
+
+                    const item = el("div", { class: "item" });
+
+                    item.appendChild((() => {
+                        const selectWrap = el("label", { class: "small chk", style: "margin:0;" }, [
+                            (() => {
+                                const cb = el("input", { type: "checkbox" });
+                                cb.checked = normalizeSelectedValue(p.selected);
+                                cb.addEventListener("change", (e) => { deepSet(state, ["projects", pi, "pointers", ppi, "selected"], e.target.checked); render(); });
+                                return cb;
+                            })(),
+                            el("span", {}, "Select")
+                        ]);
+
+                        return el("div", { class: "titleRow" }, [
+                            el("div", { class: "titleLeft" }, [
+                                selectWrap,
+                                el("div", {}, [
+                                    el("div", { class: "title" }, p.id || `pointer-${ppi + 1}`),
+                                    el("div", { class: "meta" }, (p.tags || []).join(", "))
+                                ])
+                            ]),
+                            el("div", { class: "toolbar" }, [
+                                el("button", { class: "btn", onclick: (e) => { e.preventDefault(); pr.pointers.splice(ppi, 1); render(); } }, "Remove")
+                            ])
+                        ]);
+                    })());
+
+                    item.appendChild(el("label", {}, "ID"));
+                    const idIn = el("input", { type: "text", value: p.id || "" });
+                    idIn.addEventListener("input", () => deepSet(state, ["projects", pi, "pointers", ppi, "id"], idIn.value));
+                    item.appendChild(idIn);
+
+                    item.appendChild(el("label", {}, "Tags (comma-separated)"));
+                    const tagsIn = el("input", { type: "text", value: (p.tags || []).join(", ") });
+                    tagsIn.addEventListener("input", () => { deepSet(state, ["projects", pi, "pointers", ppi, "tags"], tagsIn.value.split(",").map(x => x.trim()).filter(Boolean)); render(); });
+                    item.appendChild(tagsIn);
+
+                    const split = el("div", { class: "split" });
+
+                    if (viewMode === "both" || viewMode === "ats") {
+                        const a = el("div", {}, [el("label", {}, "ATS")]);
+                        const ta = el("textarea"); ta.value = p.ats || "";
+                        ta.addEventListener("input", () => deepSet(state, ["projects", pi, "pointers", ppi, "ats"], ta.value));
+                        a.appendChild(ta);
+                        split.appendChild(a);
+                    }
+
+                    if (viewMode === "both" || viewMode === "recruiter") {
+                        const r = el("div", {}, [el("label", {}, "Recruiter")]);
+                        const ta = el("textarea"); ta.value = p.recruiter || "";
+                        ta.addEventListener("input", () => deepSet(state, ["projects", pi, "pointers", ppi, "recruiter"], ta.value));
+                        r.appendChild(ta);
+                        split.appendChild(r);
+                    }
+
+                    item.appendChild(split);
+                    item.appendChild(el("div", { class: "tags" }, (p.tags || []).map(t => el("span", { class: "tag" }, t))));
+                    list.appendChild(item);
+                });
+
+                ptrBox.appendChild(list);
+                pCard.appendChild(ptrBox);
+                card.appendChild(pCard);
+            });
+
+            card.appendChild(el("div", { style: "margin-top:10px;" }, [
+                el("button", { class: "btn primary", onclick: () => { state.projects.push({ title: "", org: "", start: "", end: "", pointers: [] }); render(); } }, "Add project")
+            ]));
+
+            wrap.appendChild(card);
+            return wrap;
+        }
+
+        // ------------------------------------------------------------
+        // Removed pointers
+        // ------------------------------------------------------------
+        function renderRemoved() {
+            const card = el("div", { class: "card" }, [el("h2", {}, "Removed pointers")]);
+            const list = el("div", { class: "list" });
+
+            (state.removed_pointers || []).forEach((rp, i) => {
+                const item = el("div", { class: "item" }, [
+                    el("div", { class: "top" }, [
+                        el("div", {}, [
+                            el("div", { class: "title" }, rp.id || `removed-${i + 1}`),
+                            el("div", { class: "meta" }, rp.reason || "")
+                        ]),
+                        el("button", { class: "btn", onclick: () => { state.removed_pointers.splice(i, 1); render(); } }, "Remove")
+                    ])
+                ]);
+
+                item.appendChild(el("label", {}, "ID"));
+                const idIn = el("input", { type: "text", value: rp.id || "" });
+                idIn.addEventListener("input", () => deepSet(state, ["removed_pointers", i, "id"], idIn.value));
+                item.appendChild(idIn);
+
+                item.appendChild(el("label", {}, "Reason"));
+                const reasonIn = el("input", { type: "text", value: rp.reason || "" });
+                reasonIn.addEventListener("input", () => deepSet(state, ["removed_pointers", i, "reason"], reasonIn.value));
+                item.appendChild(reasonIn);
+
+                list.appendChild(item);
+            });
+
+            card.appendChild(list);
+            return card;
+        }
+
+        $("#btnAddRemoved").addEventListener("click", () => {
+            if (!state) return alert("Load JSON first.");
+            (state.removed_pointers ||= []).push({ id: "", reason: "" });
+            currentSection = "removed_pointers";
+            buildNav();
+            render();
+        });
+
+        $("#search").addEventListener("input", () => {
+            if (currentSection === "experience" || currentSection === "projects") render();
+        });
+        $("#viewMode").addEventListener("change", () => {
+            if (currentSection === "experience" || currentSection === "projects") render();
+        });
+
+        // ------------------------------------------------------------
+        // LaTeX generation (kept same; open preview is a shortcut)
+        // ------------------------------------------------------------
+        function latexEscape(s) {
+            if (s == null) return "";
+            s = String(s);
+            s = s.replaceAll("\\", "\\textbackslash{}");
+            s = s.replaceAll("&", "\\&");
+            s = s.replaceAll("%", "\\%");
+            s = s.replaceAll("$", "\\$");
+            s = s.replaceAll("#", "\\#");
+            s = s.replaceAll("_", "\\_");
+            s = s.replaceAll("~", "\\textasciitilde{}");
+            s = s.replaceAll("|", "\\textbar{}");
+            return s;
+        }
+
+        function pickBullet(ptr, mode) {
+            const ats = (ptr.ats || "").trim();
+            const rec = (ptr.recruiter || "").trim();
+            if (mode === "ats") return ats || rec;
+            if (mode === "recruiter") return rec || ats;
+            return ats || rec;
+        }
+
+        function makeHeaderLineFromSelectedBasics(basics) {
+            const sel = (basics._selected || {});
+            const parts = [];
+
+            if (normalizeSelectedValue(sel.location) && basics.location) parts.push(latexEscape(basics.location));
+            if (normalizeSelectedValue(sel.phone) && basics.phone) parts.push(latexEscape(basics.phone));
+
+            if (normalizeSelectedValue(sel.email) && basics.email) {
+                const emailRaw = String(basics.email);
+                const emailDisp = latexEscape(emailRaw);
+                parts.push(`\\href{mailto:${emailRaw}}{${emailDisp}}`);
+            }
+
+            const links = basics.links || {};
+            if (normalizeSelectedValue(sel.linkedin) && links.linkedin) {
+                const url = String(links.linkedin);
+                const disp = latexEscape(url.replace(/^https?:\/\//, ""));
+                parts.push(`\\href{${url}}{${disp}}`);
+            }
+            if (normalizeSelectedValue(sel.github) && links.github) {
+                const url = String(links.github);
+                const disp = latexEscape(url.replace(/^https?:\/\//, ""));
+                parts.push(`\\href{${url}}{${disp}}`);
+            }
+            if (normalizeSelectedValue(sel.portfolio) && links.portfolio) {
+                const url = String(links.portfolio);
+                const disp = latexEscape(url.replace(/^https?:\/\//, ""));
+                parts.push(`\\href{${url}}{${disp}}`);
+            }
+
+            return parts.join(" \\;|\\; ");
+        }
+
+        function buildTexFromSelected(selectedData, mode) {
+            const basics = selectedData.basics || {};
+            const education = Array.isArray(selectedData.education) ? selectedData.education : [];
+            const skills = Array.isArray(selectedData.skills) ? selectedData.skills : [];
+            const experience = Array.isArray(selectedData.experience) ? selectedData.experience : [];
+            const projects = Array.isArray(selectedData.projects) ? selectedData.projects : [];
+
+            const headerLine = makeHeaderLineFromSelectedBasics({ ...state.basics, ...basics });
+
+            let tex = `
+\\documentclass[10pt,letterpaper]{article}
+
+\\usepackage[margin=0.60in]{geometry}
+\\usepackage[T1]{fontenc}
+\\usepackage{lmodern}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{tabularx}
+\\usepackage{enumitem}
+\\usepackage{xcolor}
+\\usepackage{titlesec}
+\\usepackage{ragged2e}
+\\usepackage{setspace}
+
+\\pagestyle{empty}
+\\setlength{\\parindent}{0pt}
+\\setlength{\\parskip}{0pt}
+\\setstretch{0.96}
+
+\\titleformat{\\section}{\\bfseries\\large}{}{0pt}{}
+\\titlespacing*{\\section}{0pt}{4pt}{2pt}
+\\newcommand{\\sectionrule}{\\vspace{-6pt}\\rule{\\textwidth}{0.4pt}\\vspace{2pt}}
+
+\\setlist[itemize]{leftmargin=14pt, itemsep=1pt, topsep=1pt, parsep=0pt, partopsep=0pt}
+\\renewcommand\\labelitemi{$\\bullet$}
+
+\\newcommand{\\header}[2]{
+  \\begin{center}
+    {\\LARGE \\textbf{#1}}\\\\[-2pt]
+    #2
+  \\end{center}
+  \\vspace{-6pt}
+  \\rule{\\textwidth}{0.4pt}
+  \\vspace{1pt}
+}
+
+\\newcommand{\\eduentry}[4]{
+  \\textbf{#1} \\hfill \\textbf{#2}\\\\
+  #3 \\hfill \\textbf{#4}\\\\
+}
+
+\\newcommand{\\expheader}[4]{
+  \\textbf{#1} \\\\
+  \\textbf{#2} \\hfill \\textbf{#3}\\\\
+  \\vspace{-6pt}
+  \\small
+  \\begin{itemize}
+    #4
+  \\end{itemize}
+  \\normalsize
+  \\vspace{6pt}
+}
+
+\\newcommand{\\projheader}[3]{
+  \\textbf{#1} \\hfill \\textbf{#2}\\\\
+  \\vspace{-6pt}
+  \\small
+  \\begin{itemize}
+    #3
+  \\end{itemize}
+  \\normalsize
+  \\vspace{2pt}
+}
+
+\\begin{document}
+
+\\header{${latexEscape(basics.name || "")}}{${headerLine}}
+
+`;
+
+            if (education.length > 0) {
+                tex += `\\section{Education}
+\\sectionrule
+`;
+                for (const ed of education) {
+                    const school = latexEscape(ed.school || "");
+                    const end = latexEscape(ed.end || "");
+                    const degree = latexEscape(ed.degree || ed.major || "");
+                    const gpa = latexEscape(ed.gpa || "");
+                    if (school || degree) tex += `\\eduentry{${school}}{${end}}{${degree}}{${gpa}}\n`;
+                }
+                tex += "\n";
+            }
+
+            const skillLines = [];
+            for (const g of skills) {
+                const header = latexEscape(g.header || "");
+                const items = Array.isArray(g.items) ? g.items : [];
+                if (items.length === 0) continue;
+                const itemsStr = latexEscape(items.join(", "));
+                skillLines.push(`${header} & : & ${itemsStr} \\\\`);
+            }
+            if (skillLines.length > 0) {
+                tex += `\\section{Technical Skills}
+\\sectionrule
+\\renewcommand{\\arraystretch}{1.08}
+\\begin{tabularx}{\\textwidth}{@{}l @{\\hspace{6pt}}c @{\\hspace{6pt}}X@{}}
+${skillLines.join("\n")}
+\\end{tabularx}
+\\vspace{1pt}
+
+`;
+            }
+
+            if (experience.length > 0) {
+                tex += `\\section{Work Experience}
+\\sectionrule
+
+`;
+                for (const co of experience) {
+                    const company = latexEscape(co.company || "");
+                    const loc = latexEscape(co.location || "");
+                    const companyLine = loc ? `${company} \\textbar\\ ${loc}` : company;
+
+                    for (const role of (co.roles || [])) {
+                        const title = latexEscape(role.title || "");
+                        const start = latexEscape(role.start || "");
+                        const end = latexEscape(role.end || "");
+                        const dates = `${start}${start && end ? " -- " : ""}${end}`.trim();
+
+                        const bullets = [];
+                        for (const ptr of (role.pointers || [])) {
+                            const b = (pickBullet(ptr, mode) || "").trim();
+                            if (b) bullets.push(`\\item ${latexEscape(b)}`);
+                        }
+                        if (!bullets.length) continue;
+
+                        tex += `
+\\expheader
+  {${companyLine}}
+  {${title}}
+  {${dates}}
+  {
+    ${bullets.join("\n    ")}
+  }
+`;
+                    }
+                }
+                tex += "\n";
+            }
+
+            if (projects.length > 0) {
+                tex += `\\section{Academic Projects}
+\\sectionrule
+
+`;
+                for (const pr of projects) {
+                    const title = latexEscape(pr.title || pr.name || "");
+                    const org = latexEscape(pr.org || pr.school || "");
+                    const header = org ? `${title} \\textbar\\ ${org}` : title;
+
+                    const start = latexEscape(pr.start || "");
+                    const end = latexEscape(pr.end || "");
+                    const dates = `${start}${start && end ? " -- " : ""}${end}`.trim();
+
+                    const bullets = [];
+                    for (const ptr of (pr.pointers || [])) {
+                        const b = (pickBullet(ptr, mode) || "").trim();
+                        if (b) bullets.push(`\\item ${latexEscape(b)}`);
+                    }
+                    if (!bullets.length) continue;
+
+                    tex += `
+\\projheader
+  {${header}}
+  {${dates}}
+  {
+    ${bullets.join("\n    ")}
+  }
+`;
+                }
+                tex += "\n";
+            }
+
+            tex += `\\end{document}\n`;
+            return tex;
+        }
+
+        function openLatexModal(tex) {
+            generatedLatex = tex;
+            $("#latexOut").value = tex;
+            openModal("#latexModalBack");
+        }
+
+        $("#btnOpenLatexPreview").addEventListener("click", () => {
+            if (!generatedLatex) alert("Generate LaTeX first.");
+            else openModal("#latexModalBack");
+            closeAllMenus();
+        });
+
+        $("#btnGenLatex").addEventListener("click", () => {
+            if (!state) return alert("Load JSON first.");
+            ensureAllSelectionFields();
+            const mode = $("#viewMode").value;
+            const selectedOnly = buildSelectedOnlyJSONAll(state, mode);
+            const tex = buildTexFromSelected(selectedOnly, mode);
+            openLatexModal(tex);
+            closeAllMenus();
+        });
+
+        function downloadTex() {
+            if (!generatedLatex) return alert("Generate LaTeX first.");
+            downloadText("cv.tex", generatedLatex, "text/x-tex");
+        }
+        $("#btnDownloadTex").addEventListener("click", () => { downloadTex(); closeAllMenus(); });
+        $("#btnDownloadTex2").addEventListener("click", downloadTex);
+
+        $("#btnCopyLatex").addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText($("#latexOut").value || "");
+                alert("Copied LaTeX to clipboard.");
+            } catch {
+                alert("Clipboard blocked by browser. Use manual copy from the textbox.");
+            }
+        });
+
+        // ------------------------------------------------------------
+        // Paste modal buttons
+        // ------------------------------------------------------------
+        $("#btnLoadPasted").addEventListener("click", () => {
+            const text = $("#pasteBox").value.trim();
+            if (!text) return alert("Paste JSON first.");
+            try {
+                loadOrMergeJSON(JSON.parse(text), "Loaded from paste");
+                closeModal("#pasteModalBack");
+            } catch {
+                alert("Invalid JSON in paste area.");
+            }
+        });
+
+        // ------------------------------------------------------------
+        // Boot
+        // ------------------------------------------------------------
+        buildNav();
+        render();
+    </script>
+</body>
+
+</html>
